@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: fc649b0b6d8cbb9428bd209a5c126a9b
+timeCreated: 1485484716
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - abductionrayPrefab: {fileID: 1000010289239474, guid: 0133beaaa5679c948a4d0565e5196d6a,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

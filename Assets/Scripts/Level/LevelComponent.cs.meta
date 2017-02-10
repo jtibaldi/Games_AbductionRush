@@ -1,0 +1,52 @@
+fileFormatVersion: 2
+guid: 7619044ccb3ad7745b90016cd9d86350
+timeCreated: 1486573525
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - rabbitPrefab: {fileID: 1000012262340530, guid: ba149a14669ad30428a62a41975e8eb5,
+      type: 2}
+  - wolfPrefab: {fileID: 1000013294450084, guid: 0ebc5d31ddeeb72418813ce5726c6504,
+      type: 2}
+  - deerPrefab: {fileID: 1000013743668422, guid: 78fae17d3139e6d41a9079177840b20e,
+      type: 2}
+  - bearPrefab: {fileID: 1000010620555970, guid: 89bb6e306ea44484e9b2e2a7e7cdf336,
+      type: 2}
+  - duckPrefab: {fileID: 1000013194869488, guid: da9854a7d9be35f48a55519520216354,
+      type: 2}
+  - sheepPrefab: {fileID: 1000014079263426, guid: 2c121c2884dc2fb498386f097e6ff148,
+      type: 2}
+  - cowPrefab: {fileID: 1000012810872776, guid: 377d78f233c0f124abebcbc1cfcfec39,
+      type: 2}
+  - horsePrefab: {fileID: 1000012470329566, guid: 73fc054e41235254482e23b29ba88310,
+      type: 2}
+  - snakePrefab: {fileID: 1000014286243186, guid: d169cf52f1e13dd4fa7f27e014a7fdb6,
+      type: 2}
+  - foxPrefab: {fileID: 1000011979464962, guid: 2b21667c74d76dd47a0dc31e5eb40fac,
+      type: 2}
+  - antelopePrefab: {fileID: 1000010143011670, guid: 8a0b9fa7639b1d142bfae9454184c90c,
+      type: 2}
+  - jaguarPrefab: {fileID: 1000013475410104, guid: 2257b64b1de07b247bddafdb1955f9c8,
+      type: 2}
+  - penguinPrefab: {fileID: 1000010531571220, guid: 6b6437e07d2e7be44a40134452933360,
+      type: 2}
+  - whiteWolfPrefab: {fileID: 1000013225998744, guid: 98644926aecc0ed41b81b21fbb2559cd,
+      type: 2}
+  - reindeerPrefab: {fileID: 1000010895547872, guid: ce9f2c7dc1199da49bc0a21c27347f41,
+      type: 2}
+  - polarbearPrefab: {fileID: 1000012788311822, guid: bc561e1bdcb78e54e9a4d26fde1e00e4,
+      type: 2}
+  - forestBackgroundPrefab: {fileID: 1000013264741176, guid: 4e04356f3c9f2d14682324381202be65,
+      type: 2}
+  - farmBackgroundPrefab: {fileID: 1000011833404968, guid: cb58916fd9d09774aaea21b6831aabec,
+      type: 2}
+  - desertBackgroundPrefab: {fileID: 1000010884527936, guid: 09dae8fb71a76f44186c5e9c13c8ac95,
+      type: 2}
+  - articBackgroundPrefab: {fileID: 1000014067868596, guid: 25b2390c9fe95d04d9c22bfaa04642a9,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
