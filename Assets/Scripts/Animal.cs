@@ -16,9 +16,8 @@ public class Animal : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		lifeTime += Time.deltaTime;
-		Debug.Log (isCollidingWithRay());
-		Debug.Log (isCollidingWithFloor());
 		if (lifeTime >= 10 && !isCollidingWithRay() && isCollidingWithFloor()) {
+
 			Destroy (gameObject);
 		}
 	}
@@ -28,7 +27,7 @@ public class Animal : MonoBehaviour {
 		if (Collider.gameObject.tag == "abductedray") 
 		{
 			rayCollision = true;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + 5);
+			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + 3);
 		}
 		if (Collider.gameObject.tag == "ovni") 
 		{

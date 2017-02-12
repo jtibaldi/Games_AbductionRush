@@ -56,7 +56,8 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void spawnAnimal() 
-	{		
+	{
+		if(animals.Count < 20) {
 		int pos = selectRandomPosition ();
 		switch (levelConstructor) {
 		case 1:	//Wood
@@ -139,7 +140,8 @@ public class LevelManager : MonoBehaviour {
 				break;
 			}
 			break;
-		}						
+		}
+		}
 	} 
 
 	public void increaseLevel() 

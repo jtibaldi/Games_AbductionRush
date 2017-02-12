@@ -6,10 +6,14 @@ public class Player : MonoBehaviour {
 
 	public float moveSentivity = 0.20f;
 	public float speed;
+	float fireDelay = 0.15f;
+	float coolDownTimerFire = 0;
 	float crossHairBoundaryRadius = 0.5f;
 	float moveX;
 	float moveY;
 
+	public GameObject bulletRightPrefab;
+	public GameObject bulletLeftPrefab;
 	public GameObject abductionrayPrefab;
 	GameObject abductionray;
 
@@ -87,35 +91,28 @@ public class Player : MonoBehaviour {
 		{
 		case Constants.KEYBOARD_CONTROL:
 			{
+				coolDownTimerFire -= Time.deltaTime;
 				if (Input.GetKey (KeyCode.RightArrow)) {
 					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
-					//this.GetComponent<Transform>().position = new Vector2(this.GetComponent<Transform>().position.x + 0.1f, this.GetComponent<Transform>().position.y);
 				} 
 				if (Input.GetKey (KeyCode.LeftArrow)) {
 					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
-					//this.GetComponent<Transform>().position = new Vector2(this.GetComponent<Transform>().position.x - 0.1f, this.GetComponent<Transform>().position.y);
 				}
 				if (Input.GetKey (KeyCode.UpArrow)) {
 					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
-					//this.GetComponent<Transform>().position = new Vector2(this.GetComponent<Transform>().position.x, this.GetComponent<Transform>().position.y + 0.1f);
 				}
 				if (Input.GetKey (KeyCode.DownArrow)) {
 					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
-					//this.GetComponent<Transform>().position = new Vector2(this.GetComponent<Transform>().position.x, this.GetComponent<Transform>().position.y - 0.1f);
 				} 
-				/*
-				if (Input.GetKey (KeyCode.C)) {					
-					abductionray.GetComponent<Renderer> ().enabled = true;
-					abductionray.GetComponent<Transform> ().position = new Vector2(this.GetComponent<Transform>().position.x, this.GetComponent<Transform>().position.y - 2.1f); 
-					abductionray.GetComponent<Rigidbody2D> ().velocity = this.GetComponent<Rigidbody2D>().velocity; 
-				}*/
-				if (Input.GetKey (KeyCode.Z))
+				if (Input.GetKey (KeyCode.Z) && coolDownTimerFire <= 0)
 			 	{
-					//Shoot Left	
+					coolDownTimerFire = fireDelay;
+					Instantiate(bulletLeftPrefab, this.transform.position, GetComponent<Transform>().rotation);
 				}
-				if (Input.GetKey (KeyCode.X))
+				if (Input.GetKey (KeyCode.X) && coolDownTimerFire <= 0)
 				{
-					//Shoot Right	
+					coolDownTimerFire = fireDelay;
+					Instantiate(bulletRightPrefab, this.transform.position, GetComponent<Transform>().rotation);
 				}
 				break;
 			}
