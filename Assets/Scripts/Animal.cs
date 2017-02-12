@@ -5,6 +5,7 @@ public class Animal : MonoBehaviour {
 
 	bool rayCollision = false;
 	bool floorCollision = false;
+	bool dead = false;
 	float lifeTime;
 
 
@@ -17,8 +18,7 @@ public class Animal : MonoBehaviour {
 	void Update () {
 		lifeTime += Time.deltaTime;
 		if (lifeTime >= 10 && !isCollidingWithRay() && isCollidingWithFloor()) {
-
-			Destroy (gameObject);
+			dead = true;
 		}
 	}
 
@@ -65,5 +65,10 @@ public class Animal : MonoBehaviour {
 	public bool isCollidingWithFloor() 
 	{
 		return floorCollision;
+	}
+
+	public bool isDead() 
+	{
+		return dead;
 	}
 }
