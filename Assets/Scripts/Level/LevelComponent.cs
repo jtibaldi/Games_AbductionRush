@@ -28,4 +28,11 @@ public class LevelComponent : MonoBehaviour {
 	public GameObject desertBackgroundPrefab;
 	public GameObject articBackgroundPrefab;
 
+	public GameObject chopperLeftPrefab;
+	public GameObject chopperRightPrefab;
+	public GameObject player;
+
+	public GameObject explosionPrefab;
+
+	public GameObject enemyBullet;
 }

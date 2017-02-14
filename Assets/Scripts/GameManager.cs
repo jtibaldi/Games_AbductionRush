@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 		levelScript = GetComponent<LevelManager> ();
+		PlayerPrefs.SetInt ("CurrentScore", 0);
 		InitGame ();
 	}
 

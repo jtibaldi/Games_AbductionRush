@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 4fa1955d7085dfb41870285460adc598
-timeCreated: 1486829687
+timeCreated: 1486953287
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -10,6 +10,12 @@ TextureImporter:
     21300006: chopper_3
     21300008: chopper_4
     21300010: chopper_5
+    21300012: chopper_6
+    21300014: chopper_7
+    21300016: chopper_8
+    21300018: chopper_9
+    21300020: chopper_10
+    21300022: chopper_11
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -63,7 +69,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 30
+        y: 75
         width: 36
         height: 15
       alignment: 0
@@ -76,7 +82,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 36
-        y: 30
+        y: 75
         width: 36
         height: 15
       alignment: 0
@@ -89,7 +95,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 15
+        y: 60
         width: 36
         height: 15
       alignment: 0
@@ -102,7 +108,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 36
-        y: 15
+        y: 60
         width: 36
         height: 15
       alignment: 0
@@ -115,7 +121,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 45
         width: 36
         height: 15
       alignment: 0
@@ -125,6 +131,84 @@ TextureImporter:
       tessellationDetail: 0
     - serializedVersion: 2
       name: chopper_5
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 45
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 30
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_7
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 30
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 15
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_9
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 15
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 36
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: chopper_11
       rect:
         serializedVersion: 2
         x: 36

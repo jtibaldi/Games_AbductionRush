@@ -8,7 +8,6 @@ public class Animal : MonoBehaviour {
 	bool dead = false;
 	float lifeTime;
 
-
 	// Use this for initialization
 	void Start () {
 		
@@ -17,8 +16,11 @@ public class Animal : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		lifeTime += Time.deltaTime;
+
 		if (lifeTime >= 10 && !isCollidingWithRay() && isCollidingWithFloor()) {
+			Debug.Log ("dead by dissaperence");
 			dead = true;
+			lifeTime = 0;
 		}
 	}
 
@@ -30,8 +32,11 @@ public class Animal : MonoBehaviour {
 			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + 3);
 		}
 		if (Collider.gameObject.tag == "ovni") 
-		{
-			Destroy(gameObject);
+		{			
+			PlayerPrefs.SetInt ("CurrentScore", PlayerPrefs.GetInt ("CurrentScore") + 100);
+			Debug.Log ("dead by taken");
+			dead = true;
+			lifeTime = 0;
 		}
 	}
 

@@ -3,14 +3,21 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	public static int selectedController;
+	public GameObject levelComponents;
 
 	public float moveSentivity = 0.20f;
 	public float speed;
+	int life = 3;
 	float fireDelay = 0.15f;
 	float coolDownTimerFire = 0;
 	float crossHairBoundaryRadius = 0.5f;
 	float moveX;
 	float moveY;
+	private SpriteRenderer[] myRenderer;
+	private Shader shaderGUItext;
+	private Shader shaderSpritesDefault;
+	private bool wasHit = false;
+	private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
 	public GameObject bulletLeftPrefab;
@@ -19,12 +26,16 @@ public class Player : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {		
+		myRenderer = gameObject.GetComponents<SpriteRenderer> ();
+		shaderGUItext = Shader.Find("GUI/Text Shader");
+		shaderSpritesDefault = Shader.Find("Sprites/Default");
 		selectedController = Constants.KEYBOARD_CONTROL;
 		abductionray = Instantiate(abductionrayPrefab, new Vector2(1.55f, 1.7f), GetComponent<Transform>().rotation) as GameObject;
 		abductionray.GetComponent<Renderer> ().enabled = false;
 	}
 
-	void Update () {
+	void Update () {	
+		PlayerPrefs.SetInt ("CurrentLives", life);	
 		Vector3 posP1 = GetComponent<Transform>().position;
 		Vector3 posP2 = abductionray.GetComponent<Transform> ().position;
 		float screenRatio = 16.0f / 9.0f;
@@ -75,11 +86,23 @@ public class Player : MonoBehaviour {
 		}
 		GetComponent<Transform>().position = posP1;
 		abductionray.GetComponent<Transform>().position = posP2;
-		/*
-		if (Input.GetKeyUp (KeyCode.C)) {
-			abductionray.GetComponent<Renderer> ().enabled = false;
-			abductionray.GetComponent<Rigidbody2D> ().velocity = Vector2.zero; 
-		}*/
+		if (wasHit) 
+		{
+			timeOfHit += Time.deltaTime;
+			if (timeOfHit > 0.08f) {
+				normalSprite();
+				wasHit = false;
+				timeOfHit = 0;
+			}
+		}
+		if (life == 0) 
+		{
+			Destroy (gameObject);
+			Destroy (abductionray.gameObject);
+			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2(this.transform.position.x-0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab,  new Vector2(this.transform.position.x+0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+		}
+
 	}
 
 	// Update is called once per frame
@@ -149,8 +172,29 @@ public class Player : MonoBehaviour {
 		}        
 	}
 
+	void whiteSprite() {
+		myRenderer[0].material.shader = shaderGUItext;
+		myRenderer[0].color = Color.white;
+	}
+
+	void normalSprite() {
+		myRenderer[0].material.shader = shaderSpritesDefault;
+		myRenderer[0].color = Color.white;
+	}
+
 	public Vector2 getPosition()
 	{
-		return this.GetComponent<Rigidbody2D>().position;
-	}  			
+		//return this.GetComponent<Rigidbody2D>().position;
+		return this.transform.position;
+	}
+
+	void OnTriggerEnter2D(Collider2D Collider)
+	{
+		if (Collider.gameObject.tag == "enemybullet") {									
+			Destroy (Collider.gameObject);
+			whiteSprite ();
+			life -= 1;
+			wasHit = true;
+		}
+	}
 }
