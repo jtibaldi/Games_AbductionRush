@@ -7,7 +7,7 @@ public class Player : MonoBehaviour {
 
 	public float moveSentivity = 0.20f;
 	public float speed;
-	int life = 3;
+	public static int life = 3;
 	float fireDelay = 0.15f;
 	float coolDownTimerFire = 0;
 	float crossHairBoundaryRadius = 0.5f;
@@ -34,75 +34,62 @@ public class Player : MonoBehaviour {
 		abductionray.GetComponent<Renderer> ().enabled = false;
 	}
 
-	void Update () {	
-		PlayerPrefs.SetInt ("CurrentLives", life);	
-		Vector3 posP1 = GetComponent<Transform>().position;
+	public void playerUpdate () {
+		Vector3 posP1 = GetComponent<Transform> ().position;
 		Vector3 posP2 = abductionray.GetComponent<Transform> ().position;
 		float screenRatio = 16.0f / 9.0f;
 		float widthOrtho = Camera.main.orthographicSize * screenRatio;
 
-		if (posP1.x + crossHairBoundaryRadius >= widthOrtho)
-		{
+		if (posP1.x + crossHairBoundaryRadius >= widthOrtho) {
 			posP1.x = widthOrtho - crossHairBoundaryRadius;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,this.GetComponent<Rigidbody2D> ().velocity.y);
+			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
 		}
-		if (posP1.x - crossHairBoundaryRadius <= -widthOrtho)
-		{
+		if (posP1.x - crossHairBoundaryRadius <= -widthOrtho) {
 			posP1.x = -widthOrtho + crossHairBoundaryRadius;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,this.GetComponent<Rigidbody2D> ().velocity.y);
+			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
 		}
-		if (posP1.y >= (Camera.main.orthographicSize - 0.3f))
-		{
+		if (posP1.y >= (Camera.main.orthographicSize - 0.3f)) {
 			posP1.y = Camera.main.orthographicSize - 0.3f;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2(this.GetComponent<Rigidbody2D> ().velocity.x,0);
+			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
 		}
 		if (posP1.y <= (-Camera.main.orthographicSize + 4.4f)) {
 			abductionray.GetComponent<Renderer> ().enabled = true;
 			posP1.y = -Camera.main.orthographicSize + 4.4f;
 			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
-		} else 
-		{
+		} else {
 			abductionray.GetComponent<Renderer> ().enabled = false;
 		}
-		if (posP2.x + crossHairBoundaryRadius >= widthOrtho)
-		{
+		if (posP2.x + crossHairBoundaryRadius >= widthOrtho) {
 			posP2.x = widthOrtho - crossHairBoundaryRadius;
-			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,abductionray.GetComponent<Rigidbody2D> ().velocity.y);
+			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, abductionray.GetComponent<Rigidbody2D> ().velocity.y);
 		}
-		if (posP2.x - crossHairBoundaryRadius <= -widthOrtho)
-		{
+		if (posP2.x - crossHairBoundaryRadius <= -widthOrtho) {
 			posP2.x = -widthOrtho + crossHairBoundaryRadius;
-			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2(0,abductionray.GetComponent<Rigidbody2D> ().velocity.y);
+			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, abductionray.GetComponent<Rigidbody2D> ().velocity.y);
 		}
-		if (posP2.y >= (Camera.main.orthographicSize - 1.8f))
-		{
+		if (posP2.y >= (Camera.main.orthographicSize - 1.8f)) {
 			posP2.y = Camera.main.orthographicSize - 1.8f;
-			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2(abductionray.GetComponent<Rigidbody2D> ().velocity.x,0);
+			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (abductionray.GetComponent<Rigidbody2D> ().velocity.x, 0);
 		}
-		if (posP2.y <= (-Camera.main.orthographicSize + 2.2f))
-		{
+		if (posP2.y <= (-Camera.main.orthographicSize + 2.2f)) {
 			posP2.y = -Camera.main.orthographicSize + 2.2f;
-			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2(abductionray.GetComponent<Rigidbody2D> ().velocity.x, 0);
+			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (abductionray.GetComponent<Rigidbody2D> ().velocity.x, 0);
 		}
-		GetComponent<Transform>().position = posP1;
-		abductionray.GetComponent<Transform>().position = posP2;
-		if (wasHit) 
-		{
+		GetComponent<Transform> ().position = posP1;
+		abductionray.GetComponent<Transform> ().position = posP2;
+		if (wasHit) {
 			timeOfHit += Time.deltaTime;
 			if (timeOfHit > 0.08f) {
-				normalSprite();
+				normalSprite ();
 				wasHit = false;
 				timeOfHit = 0;
 			}
 		}
-		if (life == 0) 
-		{
-			Destroy (gameObject);
+		if (life <= 0) {				
 			Destroy (abductionray.gameObject);
-			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2(this.transform.position.x-0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
-			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab,  new Vector2(this.transform.position.x+0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
 		}
-
 	}
 
 	// Update is called once per frame
@@ -195,6 +182,25 @@ public class Player : MonoBehaviour {
 			whiteSprite ();
 			life -= 1;
 			wasHit = true;
+		}
+	}
+
+	void OnTriggerStay2D(Collider2D Collider) 
+	{	
+		if (Collider.gameObject.tag == "Enemy") 
+		{
+			whiteSprite ();
+			life -= 1;
+			wasHit = true;
+		}
+	}
+
+	public bool isDead() 
+	{
+		if (life <= 0) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

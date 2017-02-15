@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class Animal : MonoBehaviour {
+	public bool gameOver = false;
 
 	bool rayCollision = false;
 	bool floorCollision = false;
@@ -14,14 +15,15 @@ public class Animal : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void animalUpdate () {		
 		lifeTime += Time.deltaTime;
 
-		if (lifeTime >= 10 && !isCollidingWithRay() && isCollidingWithFloor()) {
+		if (lifeTime >= 10 && !isCollidingWithRay () && isCollidingWithFloor ()) {
 			Debug.Log ("dead by dissaperence");
 			dead = true;
 			lifeTime = 0;
 		}
+
 	}
 
 	void OnTriggerEnter2D(Collider2D Collider) 
@@ -33,7 +35,8 @@ public class Animal : MonoBehaviour {
 		}
 		if (Collider.gameObject.tag == "ovni") 
 		{			
-			PlayerPrefs.SetInt ("CurrentScore", PlayerPrefs.GetInt ("CurrentScore") + 100);
+			//PlayerPrefs.SetInt ("CurrentScore", PlayerPrefs.GetInt ("CurrentScore") + 100);
+			LevelManager.animalPoints += 100;
 			Debug.Log ("dead by taken");
 			dead = true;
 			lifeTime = 0;

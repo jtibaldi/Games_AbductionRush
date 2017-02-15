@@ -7,14 +7,19 @@
       <File FileName="Assets\Scripts\bulletLeft.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\bulletRight.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Animal.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\LevelManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\LevelManager.cs" Line="116" Column="6" />
       <File FileName="Assets\Scripts\Enemy.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Level\LevelComponent.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\explosion.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="10" Column="42" />
       <File FileName="Assets\Scripts\EnemyBullet.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\DisplayLives.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\DisplayScore.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="107" Column="35" />
+      <File FileName="Assets\Scripts\CompanyLogo.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\titleScreen.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\DisplayGameOverAnimal.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\DisplayGameOverChopper.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\DisplayGameOverTotal.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

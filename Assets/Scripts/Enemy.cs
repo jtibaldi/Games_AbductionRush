@@ -4,11 +4,13 @@ using System.Collections;
 public class Enemy : MonoBehaviour {	
 	public GameObject levelComponents;
 	public Vector2 PlayerPosition;
+	public bool gameOver = false; 
 
 	private float moveToX;
 	private float speed = 1;
 	private float bulletSpeed = 5;
-	private int life = 100;
+	private int life = 3;
+	private bool dead = false;
 
 	private SpriteRenderer[] myRenderer;
 	private Shader shaderGUItext;
@@ -28,26 +30,25 @@ public class Enemy : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {		
+	public void enemyUpdate () {			
 		shootFirstTime += Time.deltaTime;
 		shootSecondTime += Time.deltaTime;
 		shootThirdTime += Time.deltaTime; 
 
 		float step = speed * Time.deltaTime;
 
-		transform.position = Vector3.MoveTowards(transform.position, new Vector2(moveToX,transform.position.y), step);			
+		transform.position = Vector3.MoveTowards (transform.position, new Vector2 (moveToX, transform.position.y), step);			
 
-		if (life <= 0) 
-		{
-			Destroy (gameObject);
-			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2(this.transform.position.x-0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
-			Instantiate(levelComponents.GetComponent<LevelComponent> ().explosionPrefab,  new Vector2(this.transform.position.x+0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+		if (life <= 0) {
+			LevelManager.chopperPoints += 50;
+			dead = true;
+			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
+			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
 		}
-		if (wasHit) 
-		{
+		if (wasHit) {
 			timeOfHit += Time.deltaTime;
 			if (timeOfHit > 0.08f) {
-				normalSprite();
+				normalSprite ();
 				wasHit = false;
 				timeOfHit = 0;
 			}
@@ -61,6 +62,7 @@ public class Enemy : MonoBehaviour {
 			bullet.GetComponent<Rigidbody2D> ().velocity = direction * bulletSpeed;
 			shootFirstTime = 0;
 		}
+
 	}
 
 	void whiteSprite() {
@@ -82,7 +84,17 @@ public class Enemy : MonoBehaviour {
 	{
 		if (Collider.gameObject.tag == "bullet") {									
 			whiteSprite ();
-			life -= 30;
+			life -= 1;
+			wasHit = true;
+		}
+	}
+
+	void OnTriggerStay2D(Collider2D Collider) 
+	{	
+		if (Collider.gameObject.tag == "ovni") 
+		{
+			whiteSprite ();
+			life -= 1;
 			wasHit = true;
 		}
 	}
@@ -90,5 +102,10 @@ public class Enemy : MonoBehaviour {
 	public void setPlayerPosition(Vector2 _PlayerPosition) 
 	{
 		PlayerPosition = _PlayerPosition; 
+	}
+
+	public bool isDead() 
+	{
+		return dead;
 	}
 }

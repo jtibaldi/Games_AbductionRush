@@ -12,6 +12,6 @@ public class DisplayLives : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {		
-		txt.text = PlayerPrefs.GetInt ("CurrentLives").ToString();	
+		txt.text = Player.life.ToString ();
 	}
 }

@@ -46,7 +46,11 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Animal.cs" />
+     <Compile Include="Assets\Scripts\CompanyLogo.cs" />
      <Compile Include="Assets\Scripts\Constants.cs" />
+     <Compile Include="Assets\Scripts\DisplayGameOverAnimal.cs" />
+     <Compile Include="Assets\Scripts\DisplayGameOverChopper.cs" />
+     <Compile Include="Assets\Scripts\DisplayGameOverTotal.cs" />
      <Compile Include="Assets\Scripts\DisplayLives.cs" />
      <Compile Include="Assets\Scripts\DisplayScore.cs" />
      <Compile Include="Assets\Scripts\Enemy.cs" />
@@ -60,6 +64,7 @@
      <Compile Include="Assets\Scripts\bulletLeft.cs" />
      <Compile Include="Assets\Scripts\bulletRight.cs" />
      <Compile Include="Assets\Scripts\explosion.cs" />
+     <Compile Include="Assets\Scripts\titleScreen.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

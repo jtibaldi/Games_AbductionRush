@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 5efe0d5fd3756d64e9bb956d1b413610
-timeCreated: 1485696826
+timeCreated: 1487090693
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - levelScript: {instanceID: 0}
+  - companyLogoPrefab: {fileID: 1000010284707192, guid: 2f65efdab0e4deb418a1eefaa7ae34d3,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

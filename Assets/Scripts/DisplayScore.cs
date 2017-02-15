@@ -13,6 +13,7 @@ public class DisplayScore : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {		
-		txt.text = PlayerPrefs.GetInt ("CurrentScore").ToString();	
+		//txt.text = PlayerPrefs.GetInt ("CurrentScore").ToString();	
+		txt.text = (LevelManager.animalPoints + LevelManager.chopperPoints).ToString();	
 	}
 }
