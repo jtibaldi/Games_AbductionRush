@@ -108,4 +108,9 @@ public class Enemy : MonoBehaviour {
 	{
 		return dead;
 	}
+
+	public void setLifeToCero()
+	{
+		life = 0;
+	}
 }

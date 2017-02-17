@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
 	public GameObject canvas;
 	public GameObject TitleScreenCanvas;
 	public GameObject PointsScreenCanvas;
+	AudioSource GameManagerAudio;
 
 	float timer = 0;
 	float fadeTimer = 0;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour {
 		PlayerPrefs.SetInt ("CurrentScore", 0);
 		gameState = GameState.InitializeLogoScreen;
 		PointsScreenCanvas.SetActive (false);
+		GameManagerAudio = GetComponent<AudioSource> ();
 	}
 
 	// Update is called once per frame
@@ -54,6 +56,9 @@ public class GameManager : MonoBehaviour {
 			}
 			break;
 		case GameState.InitializeTitleScreen:
+			GameManagerAudio.clip = Resources.Load<AudioClip> ("Music/ovniRushMenu");	
+			GameManagerAudio.Play ();
+			GameManagerAudio.loop = true;
 			if (cameFromGame) 
 			{
 				levelScript.DestroyGameObjects();
@@ -98,6 +103,8 @@ public class GameManager : MonoBehaviour {
 					gameState = GameState.InitializeGameScreen;
 					fadeTimer = 0;
 					fadeTitleScreen = false;
+					GameManagerAudio.Stop ();
+					GameManagerAudio.loop = false;
 				}
 			}
 			break;
@@ -113,13 +120,15 @@ public class GameManager : MonoBehaviour {
 		case GameState.GameScreen:
 			levelScript.levelUpdate ();
 			break;	
-		case GameState.InitializeGameOver:
+		case GameState.InitializeGameOver:			
+			GameManagerAudio.clip = Resources.Load<AudioClip> ("Music/ovniRushGameOver");	
+			GameManagerAudio.Play();
 			canvas.SetActive (false);
 			Player.life = 3;
 			PointsScreenCanvas.SetActive (true);
 			gameState = GameState.GameOver;
 			break;
-		case GameState.GameOver:
+		case GameState.GameOver:			
 			if (Input.GetKeyDown (KeyCode.Escape)) {
 				cameFromGame = true;
 				gameState = GameState.InitializeTitleScreen;

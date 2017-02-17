@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour {
 	public GameObject levelComponents;
 	public GameObject background;
 	public GameObject foreground;
-	public enum LevelState	{ Running, Pause, GameOver, Exit }
+	public enum LevelState	{ Running, CompletePreparation, Complete, Pause, GameOver, Exit }
 	private List<EnhacedPosition> animalSpawnPoints = new List<EnhacedPosition> ();
 	private List<EnhacedPosition> enemySpawnPoints = new List<EnhacedPosition> ();
 	private int levelConstructor;
@@ -21,16 +21,18 @@ public class LevelManager : MonoBehaviour {
 	private bool animalSpawnSuccessfully = true;
 	private bool enemySpawnSuccessfully = true;
 	private bool playerIsDead;
+	private bool isLevelCompleted;
 	private LevelState levelState;
+	private float enemySpawnTime = 10.0f;
 
 	public void LevelSetup() 
 	{		
 		levelConstructor = 1;
 		currentLevel = 1;
 		createLevel ();
-		InvokeRepeating ("increaseLevel", 180, 180);
+		InvokeRepeating ("increaseLevel", 180, 180); //Poner en 180 una vez probado el cambio de nivel
 		InvokeRepeating ("spawnAnimal", 0, 5);
-		InvokeRepeating ("spawnEnemy", 2, 10.0f / (float)currentLevel);
+		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime);
 		levelState = LevelState.Running;
 		//Set Animals Spawn Points
 		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-8f,-4.4f),true));
@@ -86,8 +88,6 @@ public class LevelManager : MonoBehaviour {
 
 	public void levelUpdate() 
 	{
-		Debug.Log (levelState);
-		Debug.Log (GameManager.gameState);
 		switch (levelState) {
 		case LevelState.Running:
 			{
@@ -113,6 +113,9 @@ public class LevelManager : MonoBehaviour {
 				}
 				Player.GetComponent<Player> ().playerUpdate ();
 				if (Player.GetComponent<Player> ().isDead () || Input.GetKeyDown(KeyCode.Escape)) {
+					Player.GetComponent<Player> ().getAbductionRay ().GetComponent<AudioSource> ().Stop();
+					Player.GetComponent<AudioSource> ().Stop ();
+					Destroy (Player.GetComponent<Player> ().getAbductionRay ().gameObject);
 					Destroy (Player.gameObject);
 					levelState = LevelState.GameOver;
 					CancelInvoke ("spawnEnemy");
@@ -120,7 +123,10 @@ public class LevelManager : MonoBehaviour {
 					CancelInvoke ("spawnAnimal");
 					foreach (EnhacedPosition pos in enemySpawnPoints) 
 					{
-						Destroy (pos.getCurrentGameObject ());
+						if (pos.getCurrentGameObject () != null) {
+							pos.getCurrentGameObject ().GetComponent<AudioSource> ().Stop ();						
+							Destroy (pos.getCurrentGameObject ());
+						}
 					}
 					foreach (EnhacedPosition pos in animalSpawnPoints) 
 					{
@@ -137,6 +143,35 @@ public class LevelManager : MonoBehaviour {
 				if (!enemySpawnSuccessfully) {
 					spawnEnemy ();
 				}
+			}
+			break;
+		case LevelState.CompletePreparation:			
+			foreach (EnhacedPosition pos in enemySpawnPoints) {
+				if (pos.getCurrentGameObject () != null) {
+					pos.getCurrentGameObject ().GetComponent<Enemy> ().setLifeToCero ();
+					pos.getCurrentGameObject ().GetComponent<Enemy> ().enemyUpdate ();
+					if (pos.getCurrentGameObject ().GetComponent<Enemy> ().isDead ()) {
+						pos.setAvailability (true);
+						Destroy (pos.getCurrentGameObject ());
+					}
+				}
+			}
+			Player.GetComponent<Player> ().disableControls ();
+			Player.GetComponent<Player> ().getAbductionRay ().GetComponent<Renderer>().enabled = false;
+			Player.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 150 * Time.deltaTime);
+			levelState = LevelState.Complete;					
+			break;
+		case LevelState.Complete: 			 
+			Player.GetComponent<Player> ().playerUpdate ();
+			if (Player.GetComponent<Player> ().isPlayerGone()) 
+			{
+				createLevel ();
+				CancelInvoke ("increaseLevel");
+				InvokeRepeating ("increaseLevel", 180, 180);
+				Player.GetComponent<Player> ().enableControls ();
+				levelState = LevelState.Running;
+				Player.GetComponent<Rigidbody2D> ().position = new Vector2 (0, 0);
+				Player.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
 			}
 			break;
 		case LevelState.Pause:
@@ -160,8 +195,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	void spawnAnimal() 
-	{
-		Debug.Log ("SpawnAnimal");
+	{		
 		animalSpawnSuccessfully = true;
 		int pos = selectRandomPosition (animalSpawnPoints);
 		if (animalSpawnPoints [pos].isAvailable ()) {
@@ -249,7 +283,6 @@ public class LevelManager : MonoBehaviour {
 			}
 		} else 
 		{
-			Debug.Log ("tomada");
 			animalSpawnSuccessfully = false;
 		}
 	} 
@@ -276,13 +309,12 @@ public class LevelManager : MonoBehaviour {
 		} 
 		else 
 		{
-			Debug.Log ("tomada");
 			enemySpawnSuccessfully = false;
 		}
 	}
 
 	public void createLevel() 
-	{
+	{		
 		switch (levelConstructor) {
 		case 1:
 			Destroy (background);
@@ -304,16 +336,21 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public void increaseLevel() 
-	{		
+	{	
+		levelState = LevelState.CompletePreparation;	
 		if (levelConstructor == 4) {
 			levelConstructor = 1;
 		} else {
 			levelConstructor++;
 		}
 		currentLevel++;
-		createLevel ();
 		CancelInvoke ("spawnEnemy");
-		InvokeRepeating ("spawnEnemy", 2, 3.0f / (float)currentLevel);
+		if (enemySpawnTime > 1) {
+			enemySpawnTime -= 1;
+		} else {
+			enemySpawnTime = 1;
+		}
+		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime); 
 	}
 
 	public void DestroyGameObjects()

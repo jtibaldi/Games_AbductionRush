@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 	public static int selectedController;
+	bool playerIsGone = false;
 	public GameObject levelComponents;
 
 	public float moveSentivity = 0.20f;
@@ -17,6 +18,7 @@ public class Player : MonoBehaviour {
 	private Shader shaderGUItext;
 	private Shader shaderSpritesDefault;
 	private bool wasHit = false;
+	private bool controlsEnable = true;
 	private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
@@ -37,27 +39,31 @@ public class Player : MonoBehaviour {
 	public void playerUpdate () {
 		Vector3 posP1 = GetComponent<Transform> ().position;
 		Vector3 posP2 = abductionray.GetComponent<Transform> ().position;
+
 		float screenRatio = 16.0f / 9.0f;
 		float widthOrtho = Camera.main.orthographicSize * screenRatio;
-
-		if (posP1.x + crossHairBoundaryRadius >= widthOrtho) {
-			posP1.x = widthOrtho - crossHairBoundaryRadius;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
-		}
-		if (posP1.x - crossHairBoundaryRadius <= -widthOrtho) {
-			posP1.x = -widthOrtho + crossHairBoundaryRadius;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
-		}
-		if (posP1.y >= (Camera.main.orthographicSize - 0.3f)) {
-			posP1.y = Camera.main.orthographicSize - 0.3f;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
-		}
-		if (posP1.y <= (-Camera.main.orthographicSize + 4.4f)) {
-			abductionray.GetComponent<Renderer> ().enabled = true;
-			posP1.y = -Camera.main.orthographicSize + 4.4f;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
-		} else {
-			abductionray.GetComponent<Renderer> ().enabled = false;
+		if (controlsEnable) {
+			if (posP1.x + crossHairBoundaryRadius >= widthOrtho) {
+				posP1.x = widthOrtho - crossHairBoundaryRadius;
+				this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
+			}
+			if (posP1.x - crossHairBoundaryRadius <= -widthOrtho) {
+				posP1.x = -widthOrtho + crossHairBoundaryRadius;
+				this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
+			}
+			if (posP1.y >= (Camera.main.orthographicSize - 0.3f)) {
+				posP1.y = Camera.main.orthographicSize - 0.3f;
+				this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
+			}
+			if (posP1.y <= (-Camera.main.orthographicSize + 4.4f)) {
+				abductionray.GetComponent<AudioSource> ().Play ();
+				abductionray.GetComponent<Renderer> ().enabled = true;
+				posP1.y = -Camera.main.orthographicSize + 4.4f;
+				this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
+			} else {
+				abductionray.GetComponent<AudioSource> ().Stop ();
+				abductionray.GetComponent<Renderer> ().enabled = false;
+			}
 		}
 		if (posP2.x + crossHairBoundaryRadius >= widthOrtho) {
 			posP2.x = widthOrtho - crossHairBoundaryRadius;
@@ -85,7 +91,7 @@ public class Player : MonoBehaviour {
 				timeOfHit = 0;
 			}
 		}
-		if (life <= 0) {				
+		if (life <= 0) {			
 			Destroy (abductionray.gameObject);
 			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
 			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
@@ -97,66 +103,68 @@ public class Player : MonoBehaviour {
 	{
 		abductionray.GetComponent<Transform> ().position = new Vector2(this.GetComponent<Transform>().position.x, this.GetComponent<Transform>().position.y - 2.1f); 
 		abductionray.GetComponent<Rigidbody2D> ().velocity = this.GetComponent<Rigidbody2D>().velocity; 
-		switch (selectedController)
-		{
-		case Constants.KEYBOARD_CONTROL:
-			{
-				coolDownTimerFire -= Time.deltaTime;
-				if (Input.GetKey (KeyCode.RightArrow)) {
-					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
-				} 
-				if (Input.GetKey (KeyCode.LeftArrow)) {
-					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
-				}
-				if (Input.GetKey (KeyCode.UpArrow)) {
-					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
-				}
-				if (Input.GetKey (KeyCode.DownArrow)) {
-					this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
-				} 
-				if (Input.GetKey (KeyCode.Z) && coolDownTimerFire <= 0)
-			 	{
-					coolDownTimerFire = fireDelay;
-					Instantiate(bulletLeftPrefab, this.transform.position, GetComponent<Transform>().rotation);
-				}
-				if (Input.GetKey (KeyCode.X) && coolDownTimerFire <= 0)
+		if (controlsEnable) {
+			switch (selectedController) {
+			case Constants.KEYBOARD_CONTROL:
 				{
-					coolDownTimerFire = fireDelay;
-					Instantiate(bulletRightPrefab, this.transform.position, GetComponent<Transform>().rotation);
+					coolDownTimerFire -= Time.deltaTime;
+					if (Input.GetKey (KeyCode.RightArrow)) {
+						if (!this.GetComponent<AudioSource> ().isPlaying) {
+							this.GetComponent<AudioSource> ().Play ();
+						}
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+					} 
+					if (Input.GetKey (KeyCode.LeftArrow)) {
+						if (!this.GetComponent<AudioSource> ().isPlaying) {
+							this.GetComponent<AudioSource> ().Play ();
+						}
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+					}
+					if (Input.GetKey (KeyCode.UpArrow)) {
+						if (!this.GetComponent<AudioSource> ().isPlaying) {
+							this.GetComponent<AudioSource> ().Play ();
+						}
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
+					}
+					if (Input.GetKey (KeyCode.DownArrow)) {
+						if (!this.GetComponent<AudioSource> ().isPlaying) {
+							this.GetComponent<AudioSource> ().Play ();
+						}
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
+					} 
+					if (Input.GetKey (KeyCode.Z) && coolDownTimerFire <= 0) {
+						coolDownTimerFire = fireDelay;
+						Instantiate (bulletLeftPrefab, this.transform.position, GetComponent<Transform> ().rotation);
+					}
+					if (Input.GetKey (KeyCode.X) && coolDownTimerFire <= 0) {
+						coolDownTimerFire = fireDelay;
+						Instantiate (bulletRightPrefab, this.transform.position, GetComponent<Transform> ().rotation);
+					}
+					break;
 				}
-				break;
-			}
-		case Constants.PAD_CONTROL:
-			{
-				moveX = Input.GetAxis("Horizontal");
-				moveY = Input.GetAxis("Vertical");
-				if (moveX > 0.5)
+			case Constants.PAD_CONTROL:
 				{
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(moveX * speed, this.GetComponent<Rigidbody2D>().velocity.y);
-				}
-				else if (moveX < -0.5)
-				{
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(moveX * speed, this.GetComponent<Rigidbody2D>().velocity.y);
-				}
-				else if (moveY > 0.5)
-				{
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x, -moveY * speed);
-				}
-				else if (moveY < -0.5)
-				{
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x, -moveY * speed);
-				}
-				if (moveX > -0.5 && moveX < 0.5)
-				{                        
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(0, this.GetComponent<Rigidbody2D>().velocity.y);
-				}
-				if (moveY > -0.5 && moveY < 0.5)
-				{                        
-					this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x, 0);
-				}
-				break;
-			}		
-		}        
+					moveX = Input.GetAxis ("Horizontal");
+					moveY = Input.GetAxis ("Vertical");
+					if (moveX > 0.5) {
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * speed, this.GetComponent<Rigidbody2D> ().velocity.y);
+					} else if (moveX < -0.5) {
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * speed, this.GetComponent<Rigidbody2D> ().velocity.y);
+					} else if (moveY > 0.5) {
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, -moveY * speed);
+					} else if (moveY < -0.5) {
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, -moveY * speed);
+					}
+					if (moveX > -0.5 && moveX < 0.5) {                        
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
+					}
+					if (moveY > -0.5 && moveY < 0.5) {                        
+						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
+					}
+					break;
+				}		
+			} 
+		}
 	}
 
 	void whiteSprite() {
@@ -185,6 +193,11 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	void OnBecameInvisible() 
+	{
+		playerIsGone = true;
+	}
+
 	void OnTriggerStay2D(Collider2D Collider) 
 	{	
 		if (Collider.gameObject.tag == "Enemy") 
@@ -202,5 +215,25 @@ public class Player : MonoBehaviour {
 		} else {
 			return false;
 		}
+	}
+
+	public GameObject getAbductionRay() 
+	{
+		return abductionray;
+	}
+
+	public bool isPlayerGone() 
+	{
+		return playerIsGone;
+	}
+
+	public void disableControls() 
+	{
+		controlsEnable = false;
+	}
+
+	public void enableControls() 
+	{
+		controlsEnable = true;
 	}
 }
