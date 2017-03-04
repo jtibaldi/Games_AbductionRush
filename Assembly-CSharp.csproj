@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\DisplayGameOverChopper.cs" />
      <Compile Include="Assets\Scripts\DisplayGameOverTotal.cs" />
      <Compile Include="Assets\Scripts\DisplayLives.cs" />
+     <Compile Include="Assets\Scripts\DisplayPlayerName.cs" />
      <Compile Include="Assets\Scripts\DisplayScore.cs" />
      <Compile Include="Assets\Scripts\Enemy.cs" />
      <Compile Include="Assets\Scripts\EnemyBullet.cs" />

@@ -1,7 +1,7 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{FF6D2EF6-AD19-D86A-98F4-B1C122F87E5F}") = "Games_AbductionRush", "Assembly-CSharp.csproj", "{EE16A7DE-7276-1389-109B-3B765F2589C2}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Games_AbductionRush", "Games_AbductionRush.csproj", "{AF584A36-E19C-94F9-A812-C2687D92AC2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,15 +9,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EE16A7DE-7276-1389-109B-3B765F2589C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE16A7DE-7276-1389-109B-3B765F2589C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE16A7DE-7276-1389-109B-3B765F2589C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE16A7DE-7276-1389-109B-3B765F2589C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal
