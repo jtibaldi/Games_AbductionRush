@@ -1,15 +1,49 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+public class RankPos
+{
+    int score;
+    string name;
+
+    public RankPos(int _score, string _name)
+    {
+        score = _score;
+        name = _name;
+    }
+
+    public void setScore(int _score)
+    {
+        score = _score;
+    }
+
+    public void setName(string _name)
+    {
+        _name = name;
+    }
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public string getName()
+    {
+        return name;
+    }
+}
 
 public class GameManager : MonoBehaviour {
 	public LevelManager levelScript;
 	public enum GameState { InitializeLogoScreen, LogoScreen, InitializeTitleScreen, TitleScreen, InitializePlayerNameScreen, PlayerNameScreen, InitializeGameScreen, GameScreen, InitializeGameOver, GameOver }
 	public GameObject canvas;
 	public GameObject TitleScreenCanvas;
-	//public GameObject PointsScreenCanvas;
 	public GameObject PlayerNameScreenCanvas;
 	public GameObject RankingScreenCanvas;
-	AudioSource GameManagerAudio;
+    
+    private List<RankPos> ranking = new List<RankPos>();    
+    AudioSource GameManagerAudio;
 	bool rakingpass = false;
 
 	float timer = 0;
@@ -35,10 +69,10 @@ public class GameManager : MonoBehaviour {
 		RankingScreenCanvas.SetActive (false);
 		PlayerNameScreenCanvas.SetActive (false);
 		GameManagerAudio = GetComponent<AudioSource> ();
-	}
+    }
 
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		switch (gameState) {
 		case GameState.InitializeLogoScreen:
 			canvas.SetActive (false);
@@ -111,14 +145,60 @@ public class GameManager : MonoBehaviour {
 			}
 			break;
 		case GameState.InitializePlayerNameScreen:
+			ranking.Clear ();
+			if (PlayerPrefs.GetString ("RankingOneName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingOneScore"), "EMPTY")); }
+			else {ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingOneScore"), PlayerPrefs.GetString ("RankingOneName")));}
+			if (PlayerPrefs.GetString ("RankingTwoName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingTwoScore"), "EMPTY")); }
+			else {ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingTwoScore"), PlayerPrefs.GetString("RankingTwoName")));}
+			if (PlayerPrefs.GetString ("RankingThreeName") == "") {	ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingThreeScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingThreeScore"), PlayerPrefs.GetString("RankingThreeName"))); }
+			if (PlayerPrefs.GetString ("RankingFourName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingFourScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingFourScore"), PlayerPrefs.GetString("RankingFourName"))); }
+			if (PlayerPrefs.GetString ("RankingFiveName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingFiveScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingFiveScore"), PlayerPrefs.GetString("RankingFiveName"))); }
+			if (PlayerPrefs.GetString ("RankingSixName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingSixScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingSixScore"), PlayerPrefs.GetString("RankingSixName"))); }
+			if (PlayerPrefs.GetString ("RankingSevenName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingSevenScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingSevenScore"), PlayerPrefs.GetString("RankingSevenName"))); }
+			if (PlayerPrefs.GetString ("RankingEightName") == "") {	ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingEightScore"), "EMPTY")); }
+			else { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingEightScore"), PlayerPrefs.GetString ("RankingEightName"))); }
+			if (PlayerPrefs.GetString ("RankingNineName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingNineScore"), "EMPTY")); }
+			else { ranking.Add(new RankPos(PlayerPrefs.GetInt("RankingNineScore"), PlayerPrefs.GetString("RankingNineName"))); }
+			if (PlayerPrefs.GetString ("RankingTenName") == "") { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingTenScore"), "EMPTY")); }
+			else { ranking.Add (new RankPos (PlayerPrefs.GetInt ("RankingTenScore"), PlayerPrefs.GetString ("RankingTenName"))); } 
 			PlayerNameScreenCanvas.SetActive (true);
 			gameState = GameState.PlayerNameScreen;
 			break;
 		case GameState.PlayerNameScreen:
-			if(Input.GetKeyDown (KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) { //chequear nombre (text) para ver que no sea vacio
-				Debug.Log("hello");
-				rakingpass = true;
-				gameState = GameState.InitializeGameOver;
+			if(Input.GetKeyDown (KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) { //chequear nombre (text) para ver que no sea vacio				                    				  
+					rakingpass = true;
+                    Transform playerNameTransform = PlayerNameScreenCanvas.transform.Find("PlayerName");
+                    Text playerName = playerNameTransform.GetComponent<Text>();
+                    ranking.Add(new RankPos(LevelManager.animalPoints, playerName.text));                                        
+                    ranking.Sort((x, y) => y.getScore().CompareTo(x.getScore()));                    
+                    ranking.RemoveAt(ranking.Count - 1);
+					playerName.text = "";
+                    PlayerPrefs.SetInt("RankingOneScore", ranking[0].getScore());
+                    PlayerPrefs.SetString("RankingOneName", ranking[0].getName());
+                    PlayerPrefs.SetInt("RankingTwoScore", ranking[1].getScore());
+                    PlayerPrefs.SetString("RankingTwoName", ranking[1].getName());
+                    PlayerPrefs.SetInt("RankingThreeScore", ranking[2].getScore());
+                    PlayerPrefs.SetString("RankingThreeName", ranking[2].getName());
+                    PlayerPrefs.SetInt("RankingFourScore", ranking[3].getScore());
+                    PlayerPrefs.SetString("RankingFourName", ranking[3].getName());
+                    PlayerPrefs.SetInt("RankingFiveScore", ranking[4].getScore());
+                    PlayerPrefs.SetString("RankingFiveName", ranking[4].getName());
+                    PlayerPrefs.SetInt("RankingSixScore", ranking[5].getScore());
+                    PlayerPrefs.SetString("RankingSixName", ranking[5].getName());
+                    PlayerPrefs.SetInt("RankingSevenScore", ranking[6].getScore());
+                    PlayerPrefs.SetString("RankingSevenName", ranking[6].getName());
+                    PlayerPrefs.SetInt("RankingEightScore", ranking[7].getScore());
+                    PlayerPrefs.SetString("RankingEightName", ranking[7].getName());
+                    PlayerPrefs.SetInt("RankingNineScore", ranking[8].getScore());
+                    PlayerPrefs.SetString("RankingNineName", ranking[8].getName());
+                    PlayerPrefs.SetInt("RankingTenScore", ranking[9].getScore());
+                    PlayerPrefs.SetString("RankingTenName", ranking[9].getName());                    
+                    gameState = GameState.InitializeGameOver;
 			}
 			break;
 		case GameState.InitializeGameScreen:
@@ -134,14 +214,15 @@ public class GameManager : MonoBehaviour {
 		case GameState.GameScreen:
 			levelScript.levelUpdate ();
 			break;	
-		case GameState.InitializeGameOver:			
-			GameManagerAudio.clip = Resources.Load<AudioClip> ("Music/ovniRushGameOver");	
+		case GameState.InitializeGameOver:
+            GameManagerAudio.clip = Resources.Load<AudioClip> ("Music/ovniRushGameOver");	
 			GameManagerAudio.Play ();
 			canvas.SetActive (false);
 			Player.life = 3;
 			if (isInRanking() && !rakingpass) {
 				gameState = GameState.InitializePlayerNameScreen;
 			} else {
+				RankingScreenCanvas.GetComponent<DisplayRanking> ().UpdateRanking();
 				gameState = GameState.GameOver;
 				PlayerNameScreenCanvas.SetActive (false);
 				RankingScreenCanvas.SetActive (true);
@@ -167,53 +248,10 @@ public class GameManager : MonoBehaviour {
 
 	bool isInRanking() 
 	{
-		if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingTenPoints")) {
+		if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingTenScore")) {
 			return true;
 		} else {
 			return false;
 		}	
-	}
-
-	void caculateRankingPosition() 
-	{
-		if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingTenPoints")) {
-			if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingNinePoints")) {
-				if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingEightPoints")) {
-					if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingSevenPoints")) {
-						if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingSixPoints")) {
-							if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingFivePoints")) {
-								if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingFourPoints")) {
-									if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingThreePoints")) {
-										if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingTwoPoints")) {
-											if (LevelManager.animalPoints > PlayerPrefs.GetInt ("RankingOnePoints")) {
-												PlayerPrefs.SetInt ("RankingOnePoints", LevelManager.animalPoints);
-											} else {
-												PlayerPrefs.SetInt ("RankingTwoPoints", LevelManager.animalPoints);
-											}
-										} else {
-											PlayerPrefs.SetInt ("RankingThreePoints", LevelManager.animalPoints);
-										}
-									} else {
-										PlayerPrefs.SetInt ("RankingFourPoints", LevelManager.animalPoints);
-									}
-								} else {
-									PlayerPrefs.SetInt ("RankingFivePoints", LevelManager.animalPoints);
-								}
-							} else {
-								PlayerPrefs.SetInt ("RankingSixPoints", LevelManager.animalPoints);
-							}
-						} else {
-							PlayerPrefs.SetInt ("RankingSevenPoints", LevelManager.animalPoints);
-						}
-					} else {
-						PlayerPrefs.SetInt ("RankingEightPoints", LevelManager.animalPoints);
-					}			
-				}else{
-					PlayerPrefs.SetInt ("RankingNinePoints", LevelManager.animalPoints);
-				}
-			}else{
-				PlayerPrefs.SetInt ("RankingTenPoints", LevelManager.animalPoints);
-			}
-		}
 	}
 }

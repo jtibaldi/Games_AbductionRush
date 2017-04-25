@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Games_AbductionRush.Plugins", "Games_AbductionRush.Plugins.csproj", "{28ED6332-7C5F-1DD9-4377-4A2C9DDF0E9E}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Games_AbductionRush", "Games_AbductionRush.csproj", "{AF584A36-E19C-94F9-A812-C2687D92AC2A}"
 EndProject
 Global
@@ -9,6 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28ED6332-7C5F-1DD9-4377-4A2C9DDF0E9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28ED6332-7C5F-1DD9-4377-4A2C9DDF0E9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28ED6332-7C5F-1DD9-4377-4A2C9DDF0E9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28ED6332-7C5F-1DD9-4377-4A2C9DDF0E9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF584A36-E19C-94F9-A812-C2687D92AC2A}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -23,6 +23,6 @@ public class EnemyBullet : MonoBehaviour {
 
 	void OnBecameInvisible() 
 	{
-		Destroy (gameObject);
+		Destroy (gameObject);	
 	}
 }

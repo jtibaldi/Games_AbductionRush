@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour {
 	public GameObject levelComponents;
 	public GameObject background;
 	public GameObject foreground;
-	public enum LevelState	{ Running, CompletePreparation, Complete, Pause, GameOver, Exit }
+	public enum LevelState	{ Respawn, Running, CompletePreparation, Complete, Pause, GameOver, Exit }
 	private List<EnhacedPosition> animalSpawnPoints = new List<EnhacedPosition> ();
 	private List<EnhacedPosition> enemySpawnPoints = new List<EnhacedPosition> ();
 	private int levelConstructor;
@@ -24,13 +24,17 @@ public class LevelManager : MonoBehaviour {
 	private bool isLevelCompleted;
 	private LevelState levelState;
 	private float enemySpawnTime = 10.0f;
+	private Color alphaColor;
+	private float timeToFade = 1.5f;
+	private float fadeTimer = 0;
+
 
 	public void LevelSetup() 
 	{		
 		levelConstructor = 1;
 		currentLevel = 1;
 		createLevel ();
-		InvokeRepeating ("increaseLevel", 180, 180); //Poner en 180 una vez probado el cambio de nivel
+		InvokeRepeating ("increaseLevel", 90, 90); //Poner en 180 una vez probado el cambio de nivel
 		InvokeRepeating ("spawnAnimal", 0, 5);
 		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime);
 		levelState = LevelState.Running;
@@ -89,29 +93,69 @@ public class LevelManager : MonoBehaviour {
 	public void levelUpdate() 
 	{
 		switch (levelState) {
+        case LevelState.Respawn:
+                {
+                    Player.GetComponent<Player>().getAbductionRay().GetComponent<AudioSource>().Stop();
+                    Player.GetComponent<AudioSource>().Stop();
+                    Destroy(Player.GetComponent<Player>().getAbductionRay().gameObject);
+                    //CancelInvoke("spawnEnemy");
+                    //CancelInvoke("increaseLevel");
+                    //CancelInvoke("spawnAnimal");
+                    foreach (EnhacedPosition pos in enemySpawnPoints)
+                    {
+                        if (pos.getCurrentGameObject() != null)
+                        {
+                            pos.getCurrentGameObject().GetComponent<AudioSource>().Stop();
+                            Destroy(pos.getCurrentGameObject());
+                        }
+                    }
+                    foreach (EnhacedPosition pos in animalSpawnPoints)
+                    {
+                        Destroy(pos.getCurrentGameObject());
+                    }
+                    enemySpawnPoints.Clear();
+                    animalSpawnPoints.Clear();
+                    enemySpawnTime = 10.0f;
+                }
+                break;
+
 		case LevelState.Running:
-			{
+			{					
 				foreach (EnhacedPosition pos in animalSpawnPoints) {					
-					if (pos.getCurrentGameObject () != null) {
-						pos.getCurrentGameObject ().GetComponent<Animal> ().animalUpdate ();
-						if (pos.getCurrentGameObject ().GetComponent<Animal> ().isDead ()) {												
-							pos.setAvailability (true);
-							Destroy (pos.getCurrentGameObject ());
-						}
+					try {
+						if (pos.getCurrentGameObject () != null) {	
+							pos.getCurrentGameObject ().GetComponent<Animal> ().animalUpdate ();   ///aca esta el error 
+							if (pos.getCurrentGameObject ().GetComponent<Animal> ().isDead ()) {												
+								pos.setAvailability (true);
+								Destroy (pos.getCurrentGameObject ());
+							}
+						}					
+					}catch(NullReferenceException e) 
+					{
+						
 					}
 				}
 
 				foreach (EnhacedPosition pos in enemySpawnPoints) {					
-					if (pos.getCurrentGameObject () != null) {	
-						pos.getCurrentGameObject ().GetComponent<Enemy> ().enemyUpdate ();
-						if (pos.getCurrentGameObject ().GetComponent<Enemy> ().isDead ()) {
-							pos.setAvailability (true);
-							Destroy (pos.getCurrentGameObject ());
+					try {
+						if (pos.getCurrentGameObject () != null) {	
+							pos.getCurrentGameObject ().GetComponent<Enemy> ().enemyUpdate ();
+							if (pos.getCurrentGameObject ().GetComponent<Enemy> ().isDead ()) {
+								pos.setAvailability (true);
+								Destroy (pos.getCurrentGameObject ());
+							}
+							pos.getCurrentGameObject ().GetComponent<Enemy> ().setPlayerPosition (Player.transform.position);
 						}
-						pos.getCurrentGameObject ().GetComponent<Enemy> ().setPlayerPosition (Player.transform.position);
-					}		
+					}catch(NullReferenceException e) 
+					{
+					
+					}
 				}
 				Player.GetComponent<Player> ().playerUpdate ();
+                if (Player.GetComponent<Player>().playerLossLife())
+                {
+                    levelState = LevelState.Respawn;
+                }
 				if (Player.GetComponent<Player> ().isDead () || Input.GetKeyDown(KeyCode.Escape)) {
 					Player.GetComponent<Player> ().getAbductionRay ().GetComponent<AudioSource> ().Stop();
 					Player.GetComponent<AudioSource> ().Stop ();
@@ -134,6 +178,7 @@ public class LevelManager : MonoBehaviour {
 					}
 					enemySpawnPoints.Clear ();
 					animalSpawnPoints.Clear ();	
+					enemySpawnTime = 10.0f;
 					GameManager.gameState = GameManager.GameState.InitializeGameOver;
 				}
 				if (!animalSpawnSuccessfully) {
@@ -145,10 +190,11 @@ public class LevelManager : MonoBehaviour {
 				}
 			}
 			break;
-		case LevelState.CompletePreparation:			
+		case LevelState.CompletePreparation:						
 			foreach (EnhacedPosition pos in enemySpawnPoints) {
 				if (pos.getCurrentGameObject () != null) {
 					pos.getCurrentGameObject ().GetComponent<Enemy> ().setLifeToCero ();
+					pos.getCurrentGameObject ().GetComponent<Enemy> ().cleanEnemyBulletsFromScreen (); 
 					pos.getCurrentGameObject ().GetComponent<Enemy> ().enemyUpdate ();
 					if (pos.getCurrentGameObject ().GetComponent<Enemy> ().isDead ()) {
 						pos.setAvailability (true);
@@ -156,6 +202,13 @@ public class LevelManager : MonoBehaviour {
 					}
 				}
 			}
+			foreach (EnhacedPosition pos in animalSpawnPoints) {
+				if (pos.getCurrentGameObject () != null) {					
+					pos.setAvailability (true);
+					Destroy (pos.getCurrentGameObject ());
+				}
+			}
+			Player.GetComponent<Player> ().cleanFriendlyBulletsFromScreen ();
 			Player.GetComponent<Player> ().disableControls ();
 			Player.GetComponent<Player> ().getAbductionRay ().GetComponent<Renderer>().enabled = false;
 			Player.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 150 * Time.deltaTime);
@@ -164,14 +217,15 @@ public class LevelManager : MonoBehaviour {
 		case LevelState.Complete: 			 
 			Player.GetComponent<Player> ().playerUpdate ();
 			if (Player.GetComponent<Player> ().isPlayerGone()) 
-			{
+			{	
 				createLevel ();
 				CancelInvoke ("increaseLevel");
-				InvokeRepeating ("increaseLevel", 180, 180);
+				InvokeRepeating ("increaseLevel", 90, 90);
 				Player.GetComponent<Player> ().enableControls ();
-				levelState = LevelState.Running;
 				Player.GetComponent<Rigidbody2D> ().position = new Vector2 (0, 0);
 				Player.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
+				Player.GetComponent<Player> ().setPlayerNotGone ();
+				levelState = LevelState.Running;			
 			}
 			break;
 		case LevelState.Pause:
@@ -288,7 +342,7 @@ public class LevelManager : MonoBehaviour {
 	} 
 
 	void spawnEnemy() 
-	{
+	{		
 		enemySpawnSuccessfully = true;
 		int pos = selectRandomPosition (enemySpawnPoints);
 		if (enemySpawnPoints [pos].isAvailable ()) 

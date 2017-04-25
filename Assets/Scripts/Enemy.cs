@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 public class Enemy : MonoBehaviour {	
 	public GameObject levelComponents;
@@ -20,7 +22,7 @@ public class Enemy : MonoBehaviour {
 	private float shootFirstTime;
 	private float shootSecondTime;
 	private float shootThirdTime;
-
+	private List<GameObject> bulletsOnScreen = new List<GameObject> ();
 
 	// Use this for initialization
 	void Start () {
@@ -30,7 +32,7 @@ public class Enemy : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	public void enemyUpdate () {			
+	public void enemyUpdate () {					
 		shootFirstTime += Time.deltaTime;
 		shootSecondTime += Time.deltaTime;
 		shootThirdTime += Time.deltaTime; 
@@ -39,8 +41,7 @@ public class Enemy : MonoBehaviour {
 
 		transform.position = Vector3.MoveTowards (transform.position, new Vector2 (moveToX, transform.position.y), step);			
 
-		if (life <= 0) {
-			LevelManager.chopperPoints += 50;
+		if (life <= 0) {			
 			dead = true;
 			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
 			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
@@ -60,6 +61,7 @@ public class Enemy : MonoBehaviour {
 			direction.Normalize ();
 			GameObject bullet = Instantiate (levelComponents.GetComponent<LevelComponent> ().enemyBullet, this.transform.position, GetComponent<Transform> ().rotation) as GameObject;
 			bullet.GetComponent<Rigidbody2D> ().velocity = direction * bulletSpeed;
+			bulletsOnScreen.Add (bullet);
 			shootFirstTime = 0;
 		}
 
@@ -112,5 +114,19 @@ public class Enemy : MonoBehaviour {
 	public void setLifeToCero()
 	{
 		life = 0;
+	}
+
+	public void cleanEnemyBulletsFromScreen() 
+	{
+		foreach(GameObject bullet in bulletsOnScreen) 
+		{
+			try {
+				Destroy (bullet.gameObject);
+			}catch (MissingReferenceException e)
+			{
+
+			}
+		}
+		bulletsOnScreen.Clear ();
 	}
 }

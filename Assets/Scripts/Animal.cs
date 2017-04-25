@@ -22,7 +22,6 @@ public class Animal : MonoBehaviour {
 			dead = true;
 			lifeTime = 0;
 		}
-
 	}
 
 	void OnTriggerEnter2D(Collider2D Collider) 
@@ -30,11 +29,10 @@ public class Animal : MonoBehaviour {
 		if (Collider.gameObject.tag == "abductedray") 
 		{
 			rayCollision = true;
-			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + 3);
+			this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + 3); //modificar esto para el tema del peso.
 		}
 		if (Collider.gameObject.tag == "ovni") 
-		{			
-			//PlayerPrefs.SetInt ("CurrentScore", PlayerPrefs.GetInt ("CurrentScore") + 100);
+		{		
 			LevelManager.animalPoints += 100;
 			dead = true;
 			lifeTime = 0;

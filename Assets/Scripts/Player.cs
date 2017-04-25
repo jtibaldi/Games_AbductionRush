@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 public class Player : MonoBehaviour {
 	public static int selectedController;
@@ -14,29 +16,33 @@ public class Player : MonoBehaviour {
 	float crossHairBoundaryRadius = 0.5f;
 	float moveX;
 	float moveY;
+	float moveXj;
+	float moveYj;
 	private SpriteRenderer[] myRenderer;
 	private Shader shaderGUItext;
 	private Shader shaderSpritesDefault;
 	private bool wasHit = false;
 	private bool controlsEnable = true;
+    private bool lossLife = false;
 	private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
 	public GameObject bulletLeftPrefab;
 	public GameObject abductionrayPrefab;
 	GameObject abductionray;
+	private List<GameObject> bulletsOnScreen = new List<GameObject> ();
 
 	// Use this for initialization
 	void Start () {		
 		myRenderer = gameObject.GetComponents<SpriteRenderer> ();
 		shaderGUItext = Shader.Find("GUI/Text Shader");
 		shaderSpritesDefault = Shader.Find("Sprites/Default");
-		selectedController = Constants.KEYBOARD_CONTROL;
+		selectedController = Constants.LEGACY_CONTROLS;
 		abductionray = Instantiate(abductionrayPrefab, new Vector2(1.55f, 1.7f), GetComponent<Transform>().rotation) as GameObject;
 		abductionray.GetComponent<Renderer> ().enabled = false;
 	}
 
-	public void playerUpdate () {
+	public void playerUpdate () {        
 		Vector3 posP1 = GetComponent<Transform> ().position;
 		Vector3 posP2 = abductionray.GetComponent<Transform> ().position;
 
@@ -82,20 +88,7 @@ public class Player : MonoBehaviour {
 			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (abductionray.GetComponent<Rigidbody2D> ().velocity.x, 0);
 		}
 		GetComponent<Transform> ().position = posP1;
-		abductionray.GetComponent<Transform> ().position = posP2;
-		if (wasHit) {
-			timeOfHit += Time.deltaTime;
-			if (timeOfHit > 0.08f) {
-				normalSprite ();
-				wasHit = false;
-				timeOfHit = 0;
-			}
-		}
-		if (life <= 0) {			
-			Destroy (abductionray.gameObject);
-			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
-			Instantiate (levelComponents.GetComponent<LevelComponent> ().explosionPrefab, new Vector2 (this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform> ().rotation); 
-		}
+		abductionray.GetComponent<Transform> ().position = posP2;        
 	}
 
 	// Update is called once per frame
@@ -105,64 +98,45 @@ public class Player : MonoBehaviour {
 		abductionray.GetComponent<Rigidbody2D> ().velocity = this.GetComponent<Rigidbody2D>().velocity; 
 		if (controlsEnable) {
 			switch (selectedController) {
-			case Constants.KEYBOARD_CONTROL:
+			case Constants.LEGACY_CONTROLS:
 				{
 					coolDownTimerFire -= Time.deltaTime;
-					if (Input.GetKey (KeyCode.RightArrow)) {
+					moveX = Input.GetAxis ("Horizontal");
+					moveY = Input.GetAxis ("Vertical");
+					moveXj = Input.GetAxis ("Horizontalj");
+					moveYj = Input.GetAxis ("Verticalj");
+
+					if (moveX != 0 || moveY != 0 || moveXj != 0 || moveYj != 0) {	
 						if (!this.GetComponent<AudioSource> ().isPlaying) {
 							this.GetComponent<AudioSource> ().Play ();
 						}
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
-					} 
-					if (Input.GetKey (KeyCode.LeftArrow)) {
-						if (!this.GetComponent<AudioSource> ().isPlaying) {
-							this.GetComponent<AudioSource> ().Play ();
+						if (moveX > 0.5 || moveXj > 0.5) {						
+							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
 						}
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+						if (moveX < -0.5 || moveXj < -0.5) {
+							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+						}
+						if (moveY > 0.5 || moveYj > 0.5) {
+							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
+						}
+						if (moveY < -0.5 || moveYj < -0.5) {
+							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
+						}
 					}
-					if (Input.GetKey (KeyCode.UpArrow)) {
-						if (!this.GetComponent<AudioSource> ().isPlaying) {
-							this.GetComponent<AudioSource> ().Play ();
-						}
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
-					}
-					if (Input.GetKey (KeyCode.DownArrow)) {
-						if (!this.GetComponent<AudioSource> ().isPlaying) {
-							this.GetComponent<AudioSource> ().Play ();
-						}
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
-					} 
-					if (Input.GetKey (KeyCode.Z) && coolDownTimerFire <= 0) {
+					if (Input.GetButtonDown("FireLeft") && coolDownTimerFire <= 0) {						
 						coolDownTimerFire = fireDelay;
-						Instantiate (bulletLeftPrefab, this.transform.position, GetComponent<Transform> ().rotation);
+						bulletsOnScreen.Add(Instantiate (bulletLeftPrefab, this.transform.position, GetComponent<Transform> ().rotation) as GameObject);
 					}
-					if (Input.GetKey (KeyCode.X) && coolDownTimerFire <= 0) {
+					if (Input.GetButtonDown("FireRight") && coolDownTimerFire <= 0) {						
 						coolDownTimerFire = fireDelay;
-						Instantiate (bulletRightPrefab, this.transform.position, GetComponent<Transform> ().rotation);
+						bulletsOnScreen.Add(Instantiate (bulletRightPrefab, this.transform.position, GetComponent<Transform> ().rotation) as GameObject);
 					}
 					break;
 				}
-			case Constants.PAD_CONTROL:
-				{
-					moveX = Input.GetAxis ("Horizontal");
-					moveY = Input.GetAxis ("Vertical");
-					if (moveX > 0.5) {
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * speed, this.GetComponent<Rigidbody2D> ().velocity.y);
-					} else if (moveX < -0.5) {
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (moveX * speed, this.GetComponent<Rigidbody2D> ().velocity.y);
-					} else if (moveY > 0.5) {
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, -moveY * speed);
-					} else if (moveY < -0.5) {
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, -moveY * speed);
-					}
-					if (moveX > -0.5 && moveX < 0.5) {                        
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, this.GetComponent<Rigidbody2D> ().velocity.y);
-					}
-					if (moveY > -0.5 && moveY < 0.5) {                        
-						this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, 0);
-					}
-					break;
-				}		
+			case Constants.MOBILE_CONTROLS: 
+				transform.Translate(Input.acceleration.x, Input.acceleration.y, 0);
+				//Si funciona agregar touch para disparos en la pantalla.
+				break;
 			} 
 		}
 	}
@@ -178,8 +152,7 @@ public class Player : MonoBehaviour {
 	}
 
 	public Vector2 getPosition()
-	{
-		//return this.GetComponent<Rigidbody2D>().position;
+	{		
 		return this.transform.position;
 	}
 
@@ -187,26 +160,32 @@ public class Player : MonoBehaviour {
 	{
 		if (Collider.gameObject.tag == "enemybullet") {									
 			Destroy (Collider.gameObject);
-			whiteSprite ();
-			life -= 1;
-			wasHit = true;
-		}
-	}
+            Destroy(this.gameObject);
+            Destroy(abductionray.gameObject);
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+            life -= 1;
+            lossLife = true;
+
+        }
+
+        if (Collider.gameObject.tag == "Enemy")
+        {
+            Debug.Log("choque con enemigos");
+            Collider.GetComponent<Enemy>().setLifeToCero();            
+            Destroy(this.gameObject);
+            Destroy(abductionray.gameObject);
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+            life -= 1;
+            lossLife = true;
+        }
+    }
 
 	void OnBecameInvisible() 
 	{
 		playerIsGone = true;
-	}
-
-	void OnTriggerStay2D(Collider2D Collider) 
-	{	
-		if (Collider.gameObject.tag == "Enemy") 
-		{
-			whiteSprite ();
-			life -= 1;
-			wasHit = true;
-		}
-	}
+	}    
 
 	public bool isDead() 
 	{
@@ -216,6 +195,11 @@ public class Player : MonoBehaviour {
 			return false;
 		}
 	}
+
+    public bool playerLossLife()
+    {
+        return this.lossLife;
+    }
 
 	public GameObject getAbductionRay() 
 	{
@@ -227,6 +211,11 @@ public class Player : MonoBehaviour {
 		return playerIsGone;
 	}
 
+	public void setPlayerNotGone() 
+	{
+		playerIsGone = false;
+	}
+
 	public void disableControls() 
 	{
 		controlsEnable = false;
@@ -235,5 +224,19 @@ public class Player : MonoBehaviour {
 	public void enableControls() 
 	{
 		controlsEnable = true;
+	}
+
+	public void cleanFriendlyBulletsFromScreen() 
+	{
+		foreach(GameObject bullet in bulletsOnScreen) 
+		{
+			try {
+				Destroy (bullet.gameObject);
+			}catch (MissingReferenceException e)
+			{
+
+			}
+		}
+		bulletsOnScreen.Clear ();
 	}
 }
