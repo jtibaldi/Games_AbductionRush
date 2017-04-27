@@ -23,7 +23,7 @@ public class Player : MonoBehaviour {
 	private Shader shaderSpritesDefault;
 	private bool wasHit = false;
 	private bool controlsEnable = true;
-    private bool lossLife = false;
+    private bool lossLife;
 	private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
@@ -158,27 +158,31 @@ public class Player : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D Collider)
 	{
-		if (Collider.gameObject.tag == "enemybullet") {									
-			Destroy (Collider.gameObject);
+		if (Collider.gameObject.tag == "enemybullet") {           
+            Destroy (Collider.gameObject);
             Destroy(this.gameObject);
             Destroy(abductionray.gameObject);
             Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
             Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
             life -= 1;
-            lossLife = true;
-
+            if (life > 0)
+            {
+                LevelManager.levelState = LevelManager.LevelState.Respawn;
+            }
         }
 
         if (Collider.gameObject.tag == "Enemy")
-        {
-            Debug.Log("choque con enemigos");
+        {            
             Collider.GetComponent<Enemy>().setLifeToCero();            
             Destroy(this.gameObject);
             Destroy(abductionray.gameObject);
             Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
             Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
             life -= 1;
-            lossLife = true;
+            if (life > 0)
+            {
+                LevelManager.levelState = LevelManager.LevelState.Respawn;
+            }
         }
     }
 
@@ -198,7 +202,8 @@ public class Player : MonoBehaviour {
 
     public bool playerLossLife()
     {
-        return this.lossLife;
+        Debug.Log(lossLife);
+        return lossLife;
     }
 
 	public GameObject getAbductionRay() 
