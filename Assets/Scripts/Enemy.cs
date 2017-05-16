@@ -89,17 +89,16 @@ public class Enemy : MonoBehaviour {
 			life -= 1;
 			wasHit = true;
 		}
-	}
 
-	void OnTriggerStay2D(Collider2D Collider) 
-	{	
-		if (Collider.gameObject.tag == "ovni") 
-		{
-			whiteSprite ();
-			life -= 1;
-			wasHit = true;
-		}
-	}
+        if (Collider.gameObject.tag == "ovni")
+        {
+            whiteSprite();
+            setLifeToCero();
+            dead = true;
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+        }
+    }	
 
 	public void setPlayerPosition(Vector2 _PlayerPosition) 
 	{

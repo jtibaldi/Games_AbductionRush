@@ -24,7 +24,8 @@ public class Player : MonoBehaviour {
 	private bool wasHit = false;
 	private bool controlsEnable = true;
     private bool lossLife;
-	private float timeOfHit;
+    private bool dead = false;
+    private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
 	public GameObject bulletLeftPrefab;
@@ -160,14 +161,18 @@ public class Player : MonoBehaviour {
 	{
 		if (Collider.gameObject.tag == "enemybullet") {           
             Destroy (Collider.gameObject);
-            Destroy(this.gameObject);
-            Destroy(abductionray.gameObject);
-            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
-            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
             life -= 1;
             if (life > 0)
             {
+                Destroy(this.gameObject);
+                Destroy(abductionray.gameObject);
+                Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+                Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
                 LevelManager.levelState = LevelManager.LevelState.Respawn;
+            }
+            else
+            {
+                dead = true;
             }
         }
 
@@ -193,11 +198,7 @@ public class Player : MonoBehaviour {
 
 	public bool isDead() 
 	{
-		if (life <= 0) {
-			return true;
-		} else {
-			return false;
-		}
+        return dead;
 	}
 
     public bool playerLossLife()

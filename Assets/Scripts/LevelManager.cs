@@ -97,33 +97,26 @@ public class LevelManager : MonoBehaviour {
 
 	public void levelUpdate() 
 	{
-        Debug.Log(levelState);
         switch (levelState) {
         case LevelState.Respawn:
                 {
-                    if (!updateEnemiesOnLastTime)
+                    foreach (EnhacedPosition pos in enemySpawnPoints)
                     {
-                        foreach (EnhacedPosition pos in enemySpawnPoints)
+                        try
                         {
-                            try
-                            {
-                                if (pos.getCurrentGameObject() != null)
+                            if (pos.getCurrentGameObject() != null)
+                            {                         
+                                if (pos.getCurrentGameObject().GetComponent<Enemy>().isDead())
                                 {
-                                    pos.getCurrentGameObject().GetComponent<Enemy>().enemyUpdate();
-                                    if (pos.getCurrentGameObject().GetComponent<Enemy>().isDead())
-                                    {
-                                        pos.setAvailability(true);
-                                        Destroy(pos.getCurrentGameObject());
-                                    }
-                                    pos.getCurrentGameObject().GetComponent<Enemy>().setPlayerPosition(Player.transform.position);
-                                }
-                            }
-                            catch (NullReferenceException e)
-                            {
-
+                                    pos.setAvailability(true);
+                                    Destroy(pos.getCurrentGameObject());
+                                }                                
                             }
                         }
-                        updateEnemiesOnLastTime = true;
+                        catch (NullReferenceException e)
+                        {
+
+                        }
                     }
                     actionTimer += Time.deltaTime;
                     CancelInvoke("spawnEnemy");
@@ -198,6 +191,7 @@ public class LevelManager : MonoBehaviour {
 					
 					}
 				}
+                Debug.Log(Player.GetComponent<Player>().isDead());
 				Player.GetComponent<Player> ().playerUpdate ();                                
 				if (Player.GetComponent<Player> ().isDead () || Input.GetKeyDown(KeyCode.Escape)) {
 					Player.GetComponent<Player> ().getAbductionRay ().GetComponent<AudioSource> ().Stop();
