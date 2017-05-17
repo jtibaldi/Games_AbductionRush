@@ -42,25 +42,26 @@ public class LevelManager : MonoBehaviour {
 		InvokeRepeating ("increaseLevel", 90, 90); //Poner en 180 una vez probado el cambio de nivel
 		InvokeRepeating ("spawnAnimal", 0, 5);
 		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime);
+        InvokeRepeating("spawnItem", 30, 30);
         levelState = LevelState.Respawn;
 		//Set Animals Spawn Points
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-8f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-7f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-6f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-5f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-4f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-3f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-2f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-1f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(0f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(1f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(2f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(3f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(4f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(5f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(6f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(7f,-4.4f),true));
-		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(8f,-4.4f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-8f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-7f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-6f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-5f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-4f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-3f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-2f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(-1f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(0f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(1f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(2f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(3f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(4f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(5f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(6f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(7f,-3.9f),true));
+		animalSpawnPoints.Add (new EnhacedPosition(new Vector2(8f,-3.9f),true));
 		//Set Enemies Spawn Points (Destination) 
 		enemySpawnPoints.Add(new EnhacedPosition(new Vector2(-7f,4.3f), true));
 		enemySpawnPoints.Add(new EnhacedPosition(new Vector2(-4.5f,4.3f), true));
@@ -122,6 +123,7 @@ public class LevelManager : MonoBehaviour {
                     CancelInvoke("spawnEnemy");
                     CancelInvoke("increaseLevel");
                     CancelInvoke("spawnAnimal");
+                    CancelInvoke("spawnItem");
                     if (actionTimer > 0 && actionTimer < 1)
                     {
                         actionText.SetActive(true);
@@ -151,6 +153,7 @@ public class LevelManager : MonoBehaviour {
                         InvokeRepeating("increaseLevel", 90, 90); //Poner en 180 una vez probado el cambio de nivel
                         InvokeRepeating("spawnAnimal", 0, 5);
                         InvokeRepeating("spawnEnemy", 2, enemySpawnTime);
+                        InvokeRepeating("spawnItem", 30, 30);
                         levelState = LevelState.Running;
                         createPlayerOnce = false;
                         updateEnemiesOnLastTime = true;
@@ -190,8 +193,7 @@ public class LevelManager : MonoBehaviour {
 					{
 					
 					}
-				}
-                Debug.Log(Player.GetComponent<Player>().isDead());
+				}                
 				Player.GetComponent<Player> ().playerUpdate ();                                
 				if (Player.GetComponent<Player> ().isDead () || Input.GetKeyDown(KeyCode.Escape)) {
 					Player.GetComponent<Player> ().getAbductionRay ().GetComponent<AudioSource> ().Stop();
@@ -202,7 +204,8 @@ public class LevelManager : MonoBehaviour {
 					CancelInvoke ("spawnEnemy");
 					CancelInvoke ("increaseLevel");
 					CancelInvoke ("spawnAnimal");
-					foreach (EnhacedPosition pos in enemySpawnPoints) 
+                    CancelInvoke("spawnItem");
+                    foreach (EnhacedPosition pos in enemySpawnPoints) 
 					{
 						if (pos.getCurrentGameObject () != null) {
 							pos.getCurrentGameObject ().GetComponent<AudioSource> ().Stop ();						
@@ -284,6 +287,24 @@ public class LevelManager : MonoBehaviour {
 		System.Random rnd = new System.Random();
 		return(rnd.Next (1, 5));
 	}
+
+    void spawnItem()
+    {
+        System.Random rnd = new System.Random();
+        switch (rnd.Next(1, 4))
+        {
+            case 1:
+                Instantiate(levelComponents.GetComponent<LevelComponent>().itemLife, new Vector2(-9, 1.6f), GetComponent<Transform>().rotation);
+                break;
+            case 2:
+                Instantiate(levelComponents.GetComponent<LevelComponent>().itemShield, new Vector2(9, 1.6f), GetComponent<Transform>().rotation);
+                break;
+            case 3:
+                Instantiate(levelComponents.GetComponent<LevelComponent>().itemBomb, new Vector2(-9, 1.6f), GetComponent<Transform>().rotation);
+                break;
+        }
+        Debug.Log("spanwItem");
+    }
 
 	void spawnAnimal() 
 	{		

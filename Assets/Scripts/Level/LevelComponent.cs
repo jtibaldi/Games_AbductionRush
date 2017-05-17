@@ -35,4 +35,7 @@ public class LevelComponent : MonoBehaviour {
 	public GameObject explosionPrefab;
 
 	public GameObject enemyBullet;
+    public GameObject itemLife;
+    public GameObject itemShield;
+    public GameObject itemBomb;
 }

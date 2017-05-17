@@ -5,7 +5,8 @@ using System;
 
 public class Player : MonoBehaviour {
 	public static int selectedController;
-	bool playerIsGone = false;
+    public static int topspeed = 3;
+    bool playerIsGone = false;
 	public GameObject levelComponents;
 
 	public float moveSentivity = 0.20f;
@@ -25,12 +26,16 @@ public class Player : MonoBehaviour {
 	private bool controlsEnable = true;
     private bool lossLife;
     private bool dead = false;
+    private bool shieldOn = false;
     private float timeOfHit;
 
 	public GameObject bulletRightPrefab;
 	public GameObject bulletLeftPrefab;
 	public GameObject abductionrayPrefab;
+    public GameObject shieldPrefab;
 	GameObject abductionray;
+    GameObject shield;
+    private float shieldTimer = 0;
 	private List<GameObject> bulletsOnScreen = new List<GameObject> ();
 
 	// Use this for initialization
@@ -46,7 +51,7 @@ public class Player : MonoBehaviour {
 	public void playerUpdate () {        
 		Vector3 posP1 = GetComponent<Transform> ().position;
 		Vector3 posP2 = abductionray.GetComponent<Transform> ().position;
-
+                
 		float screenRatio = 16.0f / 9.0f;
 		float widthOrtho = Camera.main.orthographicSize * screenRatio;
 		if (controlsEnable) {
@@ -89,7 +94,16 @@ public class Player : MonoBehaviour {
 			abductionray.GetComponent<Rigidbody2D> ().velocity = new Vector2 (abductionray.GetComponent<Rigidbody2D> ().velocity.x, 0);
 		}
 		GetComponent<Transform> ().position = posP1;
-		abductionray.GetComponent<Transform> ().position = posP2;        
+		abductionray.GetComponent<Transform> ().position = posP2;
+        if (shieldOn)
+        {
+            shieldTimer += Time.deltaTime;
+            if (shieldTimer >= 15) 
+            {
+                shieldOn = false;
+                Destroy(shield.gameObject);
+            }            
+        }
 	}
 
 	// Update is called once per frame
@@ -111,17 +125,29 @@ public class Player : MonoBehaviour {
 						if (!this.GetComponent<AudioSource> ().isPlaying) {
 							this.GetComponent<AudioSource> ().Play ();
 						}
-						if (moveX > 0.5 || moveXj > 0.5) {						
-							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+						if (moveX > 0.5 || moveXj > 0.5) {
+                                if ((this.GetComponent<Rigidbody2D>().velocity.x + moveSentivity) < topspeed)
+                                {                                    
+                                    this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x + moveSentivity, this.GetComponent<Rigidbody2D>().velocity.y);                                    
+                                }
 						}
 						if (moveX < -0.5 || moveXj < -0.5) {
-							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D> ().velocity.y);
+                                if ((this.GetComponent<Rigidbody2D>().velocity.x + moveSentivity) > -topspeed)
+                                {
+                                    this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x - moveSentivity, this.GetComponent<Rigidbody2D>().velocity.y);                                 
+                                }
 						}
 						if (moveY > 0.5 || moveYj > 0.5) {
-							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y + moveSentivity);
+                                if ((this.GetComponent<Rigidbody2D>().velocity.y + moveSentivity) < topspeed)
+                                {
+                                    this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x, this.GetComponent<Rigidbody2D>().velocity.y + moveSentivity);
+                                }
 						}
 						if (moveY < -0.5 || moveYj < -0.5) {
-							this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (this.GetComponent<Rigidbody2D> ().velocity.x, this.GetComponent<Rigidbody2D> ().velocity.y - moveSentivity);
+                                if ((this.GetComponent<Rigidbody2D>().velocity.y + moveSentivity) > -topspeed)
+                                {
+                                    this.GetComponent<Rigidbody2D>().velocity = new Vector2(this.GetComponent<Rigidbody2D>().velocity.x, this.GetComponent<Rigidbody2D>().velocity.y - moveSentivity);
+                                }
 						}
 					}
 					if (Input.GetButtonDown("FireLeft") && coolDownTimerFire <= 0) {						
@@ -138,9 +164,10 @@ public class Player : MonoBehaviour {
 				transform.Translate(Input.acceleration.x, Input.acceleration.y, 0);
 				//Si funciona agregar touch para disparos en la pantalla.
 				break;
-			} 
-		}
-	}
+			}
+            shield.transform.position = this.transform.position;
+        }
+    }
 
 	void whiteSprite() {
 		myRenderer[0].material.shader = shaderGUItext;
@@ -157,37 +184,58 @@ public class Player : MonoBehaviour {
 		return this.transform.position;
 	}
 
-	void OnTriggerEnter2D(Collider2D Collider)
-	{
-		if (Collider.gameObject.tag == "enemybullet") {           
-            Destroy (Collider.gameObject);
-            life -= 1;
-            if (life > 0)
+    void OnTriggerEnter2D(Collider2D Collider)
+    {
+        if (Collider.gameObject.tag == "enemybullet")
+        {
+            Destroy(Collider.gameObject);
+            if (!shieldOn)
             {
+                life -= 1;
+                if (life > 0)
+                {
+                    Destroy(this.gameObject);
+                    Destroy(abductionray.gameObject);
+                    Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+                    Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
+                    LevelManager.levelState = LevelManager.LevelState.Respawn;
+                }
+                else
+                {
+                    dead = true;
+                }
+            }
+        }
+        if (!shieldOn)
+        {
+            if (Collider.gameObject.tag == "Enemy")
+            {
+                Collider.GetComponent<Enemy>().setLifeToCero();
                 Destroy(this.gameObject);
                 Destroy(abductionray.gameObject);
                 Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
                 Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
-                LevelManager.levelState = LevelManager.LevelState.Respawn;
-            }
-            else
-            {
-                dead = true;
+                life -= 1;
+                if (life > 0)
+                {
+                    LevelManager.levelState = LevelManager.LevelState.Respawn;
+                }
             }
         }
+        if (Collider.gameObject.tag == "ItemLife")
+        {
+            life++;
+        }
 
-        if (Collider.gameObject.tag == "Enemy")
-        {            
-            Collider.GetComponent<Enemy>().setLifeToCero();            
-            Destroy(this.gameObject);
-            Destroy(abductionray.gameObject);
-            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x - 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
-            Instantiate(levelComponents.GetComponent<LevelComponent>().explosionPrefab, new Vector2(this.transform.position.x + 0.2f, this.transform.position.y), GetComponent<Transform>().rotation);
-            life -= 1;
-            if (life > 0)
-            {
-                LevelManager.levelState = LevelManager.LevelState.Respawn;
-            }
+        if (Collider.gameObject.tag == "ItemBomb")
+        {
+            //life++;
+        }
+
+        if (Collider.gameObject.tag == "ItemShield")
+        {
+            shieldOn = true;
+            shield = Instantiate(shieldPrefab, this.transform.position, GetComponent<Transform>().rotation) as GameObject;
         }
     }
 
