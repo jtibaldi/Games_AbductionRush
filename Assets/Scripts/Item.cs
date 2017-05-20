@@ -47,13 +47,5 @@ public class Item : MonoBehaviour
         {
             this.transform.position = new Vector2(this.transform.position.x + 1.3f * Time.deltaTime, this.transform.position.y);
         }
-    }
-
-    void OnTriggerEnter2D(Collider2D Collider)
-    {
-        if (Collider.gameObject.tag != "enemybullet" && Collider.gameObject.tag != "Enemy" && Collider.gameObject.tag != "bullet")
-        {
-            Destroy(this.gameObject);
-        }
-    }
+    }   
 }

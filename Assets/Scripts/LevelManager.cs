@@ -17,12 +17,14 @@ public class LevelManager : MonoBehaviour {
     public GameObject actionText;
 	private List<EnhacedPosition> animalSpawnPoints = new List<EnhacedPosition> ();
 	private List<EnhacedPosition> enemySpawnPoints = new List<EnhacedPosition> ();
-	private int levelConstructor;
+    private List<EnhacedPosition> tankSpawnPoints = new List<EnhacedPosition>();
+    private int levelConstructor;
 	private int currentLevel;
 	private float lastEnemy;
 	private bool animalSpawnSuccessfully = true;
 	private bool enemySpawnSuccessfully = true;
-	private bool playerIsDead;
+    private bool tankSpawnSuccessfully = true;
+    private bool playerIsDead;
 	private bool isLevelCompleted;
 
 	private float enemySpawnTime = 10.0f;
@@ -32,12 +34,11 @@ public class LevelManager : MonoBehaviour {
     private float actionTimer = 0;
     private bool createPlayerOnce = false;
     private bool updateEnemiesOnLastTime = false;
-
-
+    
 	public void LevelSetup() 
 	{		
 		levelConstructor = 1;
-		currentLevel = 1;
+		currentLevel = 5;
 		createLevel ();
 		InvokeRepeating ("increaseLevel", 90, 90); //Poner en 180 una vez probado el cambio de nivel
 		InvokeRepeating ("spawnAnimal", 0, 5);
@@ -93,11 +94,19 @@ public class LevelManager : MonoBehaviour {
 		enemySpawnPoints.Add(new EnhacedPosition(new Vector2(7f,0.3f), true));
 		enemySpawnPoints.Add(new EnhacedPosition(new Vector2(4.5f,0.3f), true));
 		enemySpawnPoints.Add(new EnhacedPosition(new Vector2(2f,0.3f), true));
-		//Player = Instantiate(levelComponents.GetComponent<LevelComponent> ().player, new Vector2(0,0), GetComponent<Transform> ().rotation) as GameObject;
-	}
+        //tankpositions
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(2f, -4.3f), true));
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(4.5f, -4.3f), true));
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(7f, -4.3f), true));
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(-2f, -4.3f), true));
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(-4.5f, -4.3f), true));
+        tankSpawnPoints.Add(new EnhacedPosition(new Vector2(-7f, -4.3f), true));
+        //Player = Instantiate(levelComponents.GetComponent<LevelComponent> ().player, new Vector2(0,0), GetComponent<Transform> ().rotation) as GameObject;
+    }
 
 	public void levelUpdate() 
 	{
+        Debug.Log(currentLevel);
         switch (levelState) {
         case LevelState.Respawn:
                 {
@@ -193,8 +202,29 @@ public class LevelManager : MonoBehaviour {
 					{
 					
 					}
-				}                
-				Player.GetComponent<Player> ().playerUpdate ();                                
+				}
+                    foreach (EnhacedPosition pos in tankSpawnPoints)
+                    {
+                        try
+                        {
+                            if (pos.getCurrentGameObject() != null)
+                            {
+                                pos.getCurrentGameObject().GetComponent<Tank>().tankUpdate();
+                                if (pos.getCurrentGameObject().GetComponent<Tank>().isDead())
+                                {
+                                    pos.setAvailability(true);
+                                    Destroy(pos.getCurrentGameObject());
+                                }
+                                pos.getCurrentGameObject().GetComponent<Tank>().setPlayerPosition(Player.transform.position);
+                            }
+                        }
+                        catch (NullReferenceException e)
+                        {
+
+                        }
+                    }
+
+                    Player.GetComponent<Player> ().playerUpdate ();                                
 				if (Player.GetComponent<Player> ().isDead () || Input.GetKeyDown(KeyCode.Escape)) {
 					Player.GetComponent<Player> ().getAbductionRay ().GetComponent<AudioSource> ().Stop();
 					Player.GetComponent<AudioSource> ().Stop ();
@@ -425,7 +455,36 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 
-	public void createLevel() 
+    void spawnTank()
+    {
+        tankSpawnSuccessfully = true;
+        int pos = selectRandomPosition(tankSpawnPoints);
+        if (tankSpawnPoints[pos].isAvailable())
+        {
+            float posX;
+            if (tankSpawnPoints[pos].getPosition().x < 0)
+            {
+                posX = -9.8f;
+                tankSpawnPoints[pos].setCurrentGameObject(Instantiate(levelComponents.GetComponent<LevelComponent>().tankPrefab, new Vector2(posX, tankSpawnPoints[pos].getPosition().y), GetComponent<Transform>().rotation) as GameObject);
+                tankSpawnPoints[pos].setAvailability(false);
+            }
+            else
+            {
+                posX = 9.8f;
+                GameObject tank = Instantiate(levelComponents.GetComponent<LevelComponent>().tankPrefab, new Vector2(posX, tankSpawnPoints[pos].getPosition().y), GetComponent<Transform>().rotation) as GameObject;
+                tank.GetComponent<SpriteRenderer>().flipX = true;
+                tankSpawnPoints[pos].setCurrentGameObject(tank);
+                tankSpawnPoints[pos].setAvailability(false);
+            }
+            tankSpawnPoints[pos].getCurrentGameObject().GetComponent<Tank>().moveTo(tankSpawnPoints[pos].getPosition().x);            
+        }
+        else
+        {
+            tankSpawnSuccessfully = false;
+        }
+    }
+
+    public void createLevel() 
 	{		
 		switch (levelConstructor) {
 		case 1:
@@ -462,8 +521,22 @@ public class LevelManager : MonoBehaviour {
 		} else {
 			enemySpawnTime = 1;
 		}
-		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime); 
-	}
+		InvokeRepeating ("spawnEnemy", 2, enemySpawnTime);
+        if (currentLevel > 4 && currentLevel < 9)
+        {
+            InvokeRepeating("spawnTank", 8, enemySpawnTime * 4);
+        }
+        if (currentLevel > 8 && currentLevel < 13)
+        {
+            CancelInvoke("spawnTank");
+            InvokeRepeating("spawnTank", 4, enemySpawnTime * 2);
+        }
+        if (currentLevel > 13)
+        {
+            CancelInvoke("spawnTank");
+            InvokeRepeating("spawnTank",2, enemySpawnTime);
+        }
+    }
 
 	public void DestroyGameObjects()
 	{

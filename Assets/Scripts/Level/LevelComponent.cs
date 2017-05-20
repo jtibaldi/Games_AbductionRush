@@ -38,4 +38,7 @@ public class LevelComponent : MonoBehaviour {
     public GameObject itemLife;
     public GameObject itemShield;
     public GameObject itemBomb;
+
+    public GameObject tankPrefab;
+    public GameObject bombPrefab;
 }

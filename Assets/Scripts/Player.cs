@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
 	public float moveSentivity = 0.20f;
 	public float speed;
 	public static int life = 3;
+    public static int bombs = 1;
 	float fireDelay = 0.15f;
 	float coolDownTimerFire = 0;
 	float crossHairBoundaryRadius = 0.5f;
@@ -101,6 +102,7 @@ public class Player : MonoBehaviour {
             if (shieldTimer >= 15) 
             {
                 shieldOn = false;
+                shieldTimer = 0;
                 Destroy(shield.gameObject);
             }            
         }
@@ -158,14 +160,26 @@ public class Player : MonoBehaviour {
 						coolDownTimerFire = fireDelay;
 						bulletsOnScreen.Add(Instantiate (bulletRightPrefab, this.transform.position, GetComponent<Transform> ().rotation) as GameObject);
 					}
-					break;
+                    if (Input.GetButtonDown("FireDown") && coolDownTimerFire <= 0) {
+                            if (bombs > 0)
+                            {
+                                coolDownTimerFire = fireDelay;
+                                bulletsOnScreen.Add(Instantiate(levelComponents.GetComponent<LevelComponent>().bombPrefab, this.transform.position, GetComponent<Transform>().rotation) as GameObject);
+                                bombs--;
+                            }
+                    }
+                    break;
 				}
 			case Constants.MOBILE_CONTROLS: 
 				transform.Translate(Input.acceleration.x, Input.acceleration.y, 0);
 				//Si funciona agregar touch para disparos en la pantalla.
 				break;
 			}
-            shield.transform.position = this.transform.position;
+            //add try catch
+            if (shieldOn)
+            {
+                shield.transform.position = this.transform.position;
+            }
         }
     }
 
@@ -225,17 +239,20 @@ public class Player : MonoBehaviour {
         if (Collider.gameObject.tag == "ItemLife")
         {
             life++;
+            Destroy(Collider.gameObject);            
         }
 
         if (Collider.gameObject.tag == "ItemBomb")
         {
-            //life++;
+            bombs++;
+            Destroy(Collider.gameObject);
         }
 
         if (Collider.gameObject.tag == "ItemShield")
         {
             shieldOn = true;
             shield = Instantiate(shieldPrefab, this.transform.position, GetComponent<Transform>().rotation) as GameObject;
+            Destroy(Collider.gameObject);
         }
     }
 
